@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Registration Form</title>
+    <style>
+        body {
+            background-image: url('hos.jpg'); /* Replace with your image path */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+
+            font-family: Arial, sans-serif;
+        }
+        .form-container, .result-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+        h2, h3 {
+            color: #ff6f61;
+            margin: 10px 0;
+        }
+        input[type="text"], input[type="email"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #f7e7b6;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #f2d97d;
+        }
+        .patient-image {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .back-btn {
+            display: block;
+            text-align: left;
+            margin-bottom: 10px;
+            color: #555;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #f7e7b6;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #f2d97d;
+        }
+    </style>
+</head>
+<body>
+    <a href="admin-dashboard.html" class="back-btn">&larr; Back</a>
+    <div class="form-container">
+        <h2>Hospital Database Management System</h2>
+        <h3>Patient Registration</h3>
+
+        <form id="patientForm" enctype="multipart/form-data">
+            <input type="text" id="name" name="name" placeholder="Enter Name" required>
+            <input type="email" id="email" name="email" placeholder="Enter Email" required>
+            <input type="text" id="phone" name="phone" placeholder="Enter Phone Number" pattern="[0-9]{10}" title="Phone number must be 10 digits" required>
+            <input type="text" id="address" name="address" placeholder="Enter Address" maxlength="30" required>
+            <input type="file" id="profile_image" name="profile_image" accept="image/*" required>
+            <button type="submit">Encode</button>
+        </form>
+    </div>
+
+    <div class="result-container" style="display: none;">
+        <a href="admin-dashboard.html" class="back-btn">&larr; Back</a>
+        <h1>Patient Added Successfully</h1>
+        <img id="patientImage" alt="Patient Image" class="patient-image">
+        <button class="download-btn" onclick="downloadImage()">Download Image</button>
+        <p id="download-message" style="display:none;">Image is getting downloaded. Use the image to view details.</p>
+    </div>
+
+    <script>
+        // Function to convert string to binary
+        function stringToBinary(str) {
+            return str.split('').map(char => char.charCodeAt(0).toString(2).padStart(8, '0')).join('');
+        }
+
+        // Function to encode the binary data into image pixel data
+        function encodeDataInImage(imageData, binaryData) {
+            const pixels = imageData.data;
+            let dataIndex = 0;
+
+            for (let i = 0; i < pixels.length && dataIndex < binaryData.length; i += 4) {
+                const bit = binaryData[dataIndex];
+                pixels[i] = (pixels[i] & ~1) | (bit === '1' ? 1 : 0);
+                dataIndex++;
+            }
+
+            return imageData;
+        }
+
+        // Form submission for encoding
+        document.getElementById('patientForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            const image = document.getElementById('profile_image').files[0];
+
+            // Prepare data for encoding with clear delimiters and null termination
+            const formData = `Name:${name}\nEmail:${email}\nPhone:${phone}\nAddress:${address}\n\0`; // Add null termination
+            const binaryData = stringToBinary(formData);
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    if (binaryData.length > (imageData.data.length / 4)) {
+                        alert('The image is too small to encode all the data!');
+                        return;
+                    }
+
+                    const encodedImageData = encodeDataInImage(imageData, binaryData);
+                    ctx.putImageData(encodedImageData, 0, 0);
+                    const encodedImage = canvas.toDataURL();
+                    localStorage.setItem('patientImage', encodedImage);
+                    document.querySelector('.form-container').style.display = 'none';
+                    document.querySelector('.result-container').style.display = 'block';
+                    document.getElementById('patientImage').src = encodedImage;
+                };
+            };
+            reader.readAsDataURL(image);
+        });
+
+        // Download the encoded image
+        function downloadImage() {
+            const patientImage = localStorage.getItem('patientImage');
+            const name = document.getElementById('name').value;
+            if (patientImage) {
+                const link = document.createElement('a');
+                link.href = patientImage;
+                link.download = `${name}-encoded-image.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                document.getElementById('download-message').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Login</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('hos.jpg'); /* Set background image if necessary */
+            background-size: cover;
+            background-position: center;
+        }
+
+        h2 {
+            color: #ff6b6b;
+            font-size: 36px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-panel-title {
+            color: #b8b800;
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        .login-container {
+            background-color: #fff;
+            padding: 40px;
+            width: 350px;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-top: -50px; /* Adjusted to be centered based on your image */
+        }
+
+        .login-container input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 20px 0;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .login-container input[type="submit"] {
+            background-color: #f8e7b2;
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            border-radius: 15px;
+            box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        .login-container input[type="submit"]:hover {
+            background-color: #f3d28d;
+        }
+
+        #error-msg {
+            color: red;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #f7e7b6;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #f2d97d;
+        }
+    </style>
+</head>
+<body>
+    <a href="first.html" class="back-btn">&larr; Back</a>
+    <div class="login-container">
+        <h2>Hospital Database Management System</h2>
+        <p class="admin-panel-title">Doctor Login</p>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Enter Doctor Email" required>
+            <input type="password" id="password" placeholder="Enter Password" required>
+            <input type="submit" value="Login">
+        </form>
+        <p id="error-msg"></p>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting the default way
+
+            // Admin credentials (for simplicity, hardcoding them here)
+            const doctorEmail = "doctor@hospital.com";
+            const doctorPassword = "doctor123";
+
+            // Get the entered values
+            const enteredEmail = document.getElementById('email').value;
+            const enteredPassword = document.getElementById('password').value;
+
+            // Validate the credentials
+            if (enteredEmail === doctorEmail && enteredPassword === doctorPassword) {
+                window.location.href = "doctor-dasboard.html"; // Redirect to admin page
+            } else {
+                document.getElementById('error-msg').textContent = "Invalid email or password!";
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Registration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f8f9;
+            background-image: url('hos.jpg'); /* Replace with your image path */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .form-container, .result-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+        .form-container h2, .result-container h1 {
+            color: #ff6f61;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .form-container h3 {
+            color: #a2ad00;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="email"], input[type="number"], input[type="file"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #f7e7b6;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #f2d97d;
+        }
+        .doctor-image {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .back-btn {
+            display: block;
+            text-align: left;
+            margin-bottom: 10px;
+            color: #555;
+            text-decoration: none;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Hospital Database Management System</h2>
+        <h3>Doctor Registration</h3>
+
+        <form id="doctorForm" enctype="multipart/form-data">
+            <input type="text" id="name" name="name" placeholder="Enter Name" required>
+            <div id="nameError" class="error"></div>
+
+            <input type="email" id="email" name="email" placeholder="Enter Email" required>
+            <div id="emailError" class="error"></div>
+
+            <input type="text" id="phone" name="phone" placeholder="Enter Phone Number" pattern="[0-9]{10}" title="Phone number must be 10 digits" required>
+            <div id="phoneError" class="error"></div>
+
+            <input type="text" id="qualification" name="qualification" placeholder="Enter Qualification" required>
+            <div id="qualificationError" class="error"></div>
+
+            <textarea id="address" name="address" placeholder="Enter Address" required></textarea>
+            <div id="addressError" class="error"></div>
+
+            <input type="file" id="profile_image" name="profile_image" accept="image/*" required>
+            <div id="imageError" class="error"></div>
+
+            <button type="submit">Encode</button>
+        </form>
+    </div>
+
+    <div class="result-container" style="display: none;">
+        <!-- Back Button -->
+        <a href="admin-dashboard.html" class="back-btn">&larr; Back</a>
+
+        <h1>Doctor Added Successfully</h1>
+        <img id="doctorImage" alt="Doctor Image" class="doctor-image">
+        <button class="download-btn" onclick="downloadImage()">Download Image</button>
+        <p id="download-message" style="display:none;">Image is getting downloaded. Use the image to view details.</p>
+    </div>
+
+    <script>
+        document.getElementById('doctorForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Clear previous errors
+            document.querySelectorAll('.error').forEach(function (el) {
+                el.textContent = '';
+            });
+
+            let valid = true;
+
+            // Validate fields...
+            const name = document.getElementById('name').value;
+            if (name.length < 3) {
+                document.getElementById('nameError').textContent = 'Name must be at least 3 characters long.';
+                valid = false;
+            }
+
+            const email = document.getElementById('email').value;
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                document.getElementById('emailError').textContent = 'Please enter a valid email address.';
+                valid = false;
+            }
+
+            const phone = document.getElementById('phone').value;
+            const phonePattern = /^[0-9]{10}$/;
+            if (!phonePattern.test(phone)) {
+                document.getElementById('phoneError').textContent = 'Phone number must be 10 digits.';
+                valid = false;
+            }
+
+            const qualification = document.getElementById('qualification').value;
+            if (qualification === '') {
+                document.getElementById('qualificationError').textContent = 'Qualification is required.';
+                valid = false;
+            }
+
+            const address = document.getElementById('address').value;
+            if (address.length < 10) {
+                document.getElementById('addressError').textContent = 'Address must be at least 10 characters long.';
+                valid = false;
+            }
+
+            const image = document.getElementById('profile_image').files[0];
+            if (!image) {
+                document.getElementById('imageError').textContent = 'Please upload a profile image.';
+                valid = false;
+            } else {
+                const fileSize = image.size / 1024 / 1024; // in MB
+                if (fileSize > 2) {
+                    document.getElementById('imageError').textContent = 'File size must be less than 2MB.';
+                    valid = false;
+                }
+            }
+
+            // If validation fails, prevent form submission
+            if (!valid) {
+                return;
+            }
+
+            // If valid, process the image and store it in localStorage
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Store the image in localStorage
+                localStorage.setItem('doctorImage', e.target.result);
+
+                // Hide the form and show the result
+                document.querySelector('.form-container').style.display = 'none';
+                document.querySelector('.result-container').style.display = 'block';
+
+                // Display the image
+                document.getElementById('doctorImage').src = e.target.result;
+            };
+            reader.readAsDataURL(image);
+        });
+
+        // Download image function
+        function downloadImage() {
+            const doctorImage = localStorage.getItem('doctorImage');
+            if (doctorImage) {
+                const link = document.createElement('a');
+                link.href = doctorImage; // Base64 image
+                link.download = 'doctor-image.png'; // Customize filename
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                document.getElementById('download-message').style.display = 'block'; // Show download message
+            }
+        }
+    </script>
+
+</body>
+</html>

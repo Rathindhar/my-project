@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Database Management System</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('hos.jpg'); /* Replace with your image path */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            color: #F5B5B2;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #B4B800;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            justify-items: center;
+        }
+
+        .grid-item {
+            background-color: #FBEBC3;
+            padding: 15px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .grid-item:hover {
+            transform: scale(1.1);
+        }
+
+        .bottom-item {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hospital Database Management System</h1>
+        <h2>Admin Login</h2>
+
+        <div class="grid">
+            <div class="grid-item"><a href="view patients.html" style="text-decoration:none;">Decode Data</a></div>
+            <div class="grid-item"><a href="add patient.html" style="text-decoration:none;">View Patient List</a></div> 
+                     
+            <!--<div class="grid-item bottom-item">Supplier Rate List</div>-->
+        </div>
+    </div>
+</body>
+</html>

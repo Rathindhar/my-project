@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Steganography - Decode Message</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            background-image: url('hos.jpg'); /* Replace with your image path */
+            background-size: cover;
+            background-position: center;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 20px;
+            width: 400px;
+        }
+        h1 {
+            color: #ff6f61;
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            margin: 20px 0;
+            width: 80%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #f7e7b6;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #f2d97d;
+        }
+        .result {
+            margin-top: 20px;
+            color: #555;
+            white-space: pre-wrap; /* Preserve whitespace for decoded text */
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #f7e7b6;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #f2d97d;
+        }
+    </style>
+</head>
+<body>
+    <a href="doctor-dasboard.html" class="back-btn">&larr; Back</a>
+    <div class="container">
+        <h1>Decode Data</h1>
+        <input type="file" id="imageDecode" accept="image/*">
+        <button id="decodeBtn">Decode Message</button>
+        <pre class="result" id="decodedResult"></pre>
+        <br>
+        <a href="doctor-dasboard.html">Go to Doctor Dashboard</a> <!-- Link to encode page -->
+    </div>
+
+    <script>
+        // Decode function
+        document.getElementById('decodeBtn').addEventListener('click', function() {
+            const fileInput = document.getElementById('imageDecode');
+            if (fileInput.files.length === 0) {
+                alert('Please upload an image!');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+
+                    // Decode the message
+                    let binaryMessage = '';
+                    for (let i = 0; i < data.length; i += 4) {
+                        binaryMessage += (data[i] & 1); // Get the LSB
+                    }
+
+                    // Extract message length
+                    const messageLengthBinary = binaryMessage.slice(0, 8);
+                    const messageLength = parseInt(messageLengthBinary, 2);
+                    let message = '';
+
+                    // Extract the message characters
+                    if (messageLength > 0) {
+                        for (let i = 0; i < messageLength; i++) {
+                            const charBinary = binaryMessage.slice(8 + (i * 8), 8 + (i * 8) + 8);
+                            const charCode = parseInt(charBinary, 2);
+                            if (charCode === 0) break; // Stop if a null character is encountered
+                            message += String.fromCharCode(charCode);
+                        }
+                    }
+
+                    // Format the message
+                    const formattedMessage = message
+                        .replace(/^/, 'Name: ')  // Prepend "Name: " to the start
+                        .replace(/Name: /, ' N') // Ensure proper spacing for Name
+                        .replace(/Email:/, 'Email: ') // Ensure Email appears on a new line
+                        .replace(/Phone:/, 'Phone: ') // Ensure Phone appears on a new line
+                        .replace(/Address:/, 'Address: ') // Ensure Address appears on a new line
+                        .replace(/\x00/g, '') // Remove null characters
+                        .replace(/\s+$/, ''); // Remove any trailing whitespace
+
+                    // Display the decoded message
+                    document.getElementById('decodedResult').innerText = `Decoded Message:\n${formattedMessage}`;
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
+
+</body>
+</html>
